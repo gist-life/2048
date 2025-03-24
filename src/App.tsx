@@ -5,8 +5,8 @@ import Ranking from "./pages/Ranking.tsx";
 export default function App() {
     return (
         <Routes>
-            <Route path="/" element={<Game/>}></Route>
-            <Route path="/ranking" element={<Ranking/>}></Route>
+            <Route path="/2048/" element={<Game/>}></Route>
+            <Route path="/2048/ranking" element={<Ranking/>}></Route>
         </Routes>
     )
 }

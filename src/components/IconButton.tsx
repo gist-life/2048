@@ -43,7 +43,7 @@ const HomeIconStyle = styled(FaHome)`
 
 export function RankingIcon() {
     return (
-        <Link to='/ranking'>
+        <Link to='/2048/ranking'>
             <RankingIconStyle>
                 <FaRankingStar/>
             </RankingIconStyle>
@@ -53,7 +53,7 @@ export function RankingIcon() {
 
 export function HomeIcon() {
     return (
-        <Link to='/'>
+        <Link to='/2048/'>
             <HomeIconStyle>
                 <FaHome/>
             </HomeIconStyle>
