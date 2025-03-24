@@ -1,19 +1,29 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { produce } from "immer";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Cell } from "./components/Cell.tsx";
 import { Grid } from "./components/Grid.tsx";
+import { Overlay } from "./components/Overlay.tsx";
+import { ScoreBoard } from "./components/ScoreBoard.tsx";
 import { TileElement } from "./components/Tile.tsx";
 import { gridSize } from "./constants/constants.ts";
-import { Direction, moveTiles, useGrid } from "./context/GridContext.tsx";
+import { Direction, moveTiles, useGame } from "./context/GameContext.tsx";
 
 export default function App() {
-    const [ grid, setGrid ] = useGrid();
+    const [ { grid, score, isOver }, setCtx ] = useGame();
     const [ cellSize, setCellSize ] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const moveTile = useCallback<(_: Direction) => void>(
-        (direction: Direction) => setGrid(moveTiles(grid, direction)),
-        [ grid, setGrid ]
+        (direction: Direction) => {
+            const [newGrid, addScore] = moveTiles(grid, direction);
+
+            setCtx(prev => produce(prev, draft => {
+                draft.score += addScore;
+                draft.grid = newGrid;
+            }));
+        },
+        [grid, setCtx]
     );
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -55,8 +65,34 @@ export default function App() {
         };
     }, []);
 
+    useEffect(() => {
+        if (grid.flat().filter(t => t == null).length === 0) {
+            let canMove = false;
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if ((i - 1 >= 0         && grid[i][j]!.value === grid[i - 1][j]!.value) ||
+                        (i + 1 < gridSize   && grid[i][j]!.value === grid[i + 1][j]!.value) ||
+                        (j - 1 >= 0         && grid[i][j]!.value === grid[i][j - 1]!.value) ||
+                        (j + 1 < gridSize   && grid[i][j]!.value === grid[i][j + 1]!.value)) 
+                    {
+                        canMove = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!canMove) {
+                setCtx(prev => produce(prev, draft => {
+                    draft.isOver = true;
+                }));
+            }
+        }
+    }, [grid, setCtx]);
+
     return (
         <div className="w-screen h-screen bg-[#faf8ef] grid place-items-center">
+            {isOver && <Overlay text="Game Over"/>}
+            <ScoreBoard score={score}/>
             <Grid ref={containerRef}>
                 {[ ...Array(gridSize * gridSize) ].map((_, i) => <Cell key={i}/>)}
                 {grid.flat().filter(t => t != null).map(tile => (

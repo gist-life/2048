@@ -3,31 +3,58 @@ import { createContext, Dispatch, PropsWithChildren, SetStateAction, useContext,
 import { Tile } from "../components/Tile.tsx";
 import { gridSize, keys } from "../constants/constants.ts";
 
-const initialGrid: (Tile | null)[][] = Array.from({ length: gridSize }, () => Array.from({ length: gridSize }, () => null));
-initialGrid[0][0] = new Tile(0, 2, 0, 0);
-initialGrid[1][1] = new Tile(1, 2, 1, 1);
-
-const GridContext = createContext<{
+type GameContextType = {
     grid: (Tile | null)[][],
-    setGrid: Dispatch<SetStateAction<(Tile | null)[][]>>
+    score: number,
+    isOver: boolean,
+}
+
+const GameContext = createContext<{
+    ctx: GameContextType,
+    setCtx: Dispatch<SetStateAction<GameContextType>>
 }>();
 
 export function GridProvider({ children }: PropsWithChildren) {
-    const [grid, setGrid] = useState(initialGrid);
+    const [ctx, setCtx] = useState<GameContextType>({
+        grid: createInitialGrid(),
+        score: 0,
+        isOver: false,
+    });
 
     return (
-        <GridContext.Provider value={{ grid, setGrid }}>
+        <GameContext.Provider value={{ ctx, setCtx }}>
             {children}
-        </GridContext.Provider>
+        </GameContext.Provider>
     )
 }
 
-export function useGrid() {
-    const { grid, setGrid } = useContext(GridContext);
-    return [grid, setGrid] as const;
+export function useGame() {
+    const { ctx, setCtx } = useContext(GameContext);
+    return [ctx, setCtx] as const;
 }
 
 export type Direction = "move_up" | "move_down" | "move_left" | "move_right";
+
+function createInitialGrid(): (Tile | null)[][] {
+    const initialGrid: (Tile | null)[][] = Array.from({ length: gridSize }, () => Array.from({ length: gridSize }, () => null));
+    initialGrid[0][0] = new Tile(0, 2, 0, 0);
+    // initialGrid[1][1] = new Tile(1, 2, 1, 1);
+    initialGrid[0][1] = new Tile(1, 4, 0, 1);
+    initialGrid[0][2] = new Tile(2, 8, 0, 2);
+    initialGrid[0][3] = new Tile(3, 16, 0, 3);
+    initialGrid[1][0] = new Tile(4, 32, 1, 0);
+    initialGrid[1][1] = new Tile(5, 64, 1, 1);
+    initialGrid[1][2] = new Tile(6, 128, 1, 2);
+    initialGrid[1][3] = new Tile(7, 256, 1, 3);
+    initialGrid[2][0] = new Tile(8, 512, 2, 0);
+    initialGrid[2][1] = new Tile(9, 1024, 2, 1);
+    initialGrid[2][2] = new Tile(10, 2048, 2, 2);
+    initialGrid[2][3] = new Tile(11, 4096, 2, 3);
+    initialGrid[3][0] = new Tile(12, 8192, 3, 0);
+    initialGrid[3][1] = new Tile(13, 16384, 3, 1);
+
+    return initialGrid;
+}
 
 export function createMoreTile(grid: (Tile | null)[][]) {
     while (true) {
@@ -47,6 +74,7 @@ export function createMoreTile(grid: (Tile | null)[][]) {
 export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
     const newGrid: (Tile | null)[][] = Array.from({ length: gridSize }, () => Array.from({ length: gridSize }, () => null));
     let isMoved = false;
+    let addScore = 0;
 
     switch (direction) {
         case "move_up": {
@@ -65,8 +93,9 @@ export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
                             continue;
 
                         if (newGrid[r][col]!.value === grid[row][col]!.value && !newGrid[r][col]!.isMerged) {
-                            newGrid[r][col] = grid[row][col]!.double().moveTo(r, col, newGrid[r][col]!.key);
+                            newGrid[r][col] = grid[row][col]!.addValue(newGrid[r][col]!).moveTo(r, col, newGrid[r][col]!.key);
                             newGrid[r][col]!.merge();
+                            addScore += newGrid[r][col]!.value;
                             isMoved = true;
                             isMerged = true;
                             cnt -= 1;
@@ -103,8 +132,9 @@ export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
                             continue;
 
                         if (newGrid[r][col]!.value === grid[row][col]!.value && !newGrid[r][col]!.isMerged) {
-                            newGrid[r][col] = grid[row][col]!.double().moveTo(r, col, newGrid[r][col]!.key);
+                            newGrid[r][col] = grid[row][col]!.addValue(newGrid[r][col]!).moveTo(r, col, newGrid[r][col]!.key);
                             newGrid[r][col]!.merge();
+                            addScore += newGrid[r][col]!.value;
                             isMoved = true;
                             isMerged = true;
                             cnt -= 1;
@@ -141,8 +171,9 @@ export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
                             continue;
 
                         if (newGrid[row][c]!.value === grid[row][col]!.value && !newGrid[row][c]!.isMerged) {
-                            newGrid[row][c] = grid[row][col]!.double().moveTo(row, c, newGrid[row][c]!.key);
+                            newGrid[row][c] = grid[row][col]!.addValue(newGrid[row][c]!).moveTo(row, c, newGrid[row][c]!.key);
                             newGrid[row][c]!.merge();
+                            addScore += newGrid[row][c]!.value;
                             isMoved = true;
                             isMerged = true;
                             cnt -= 1;
@@ -179,8 +210,9 @@ export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
                             continue;
 
                         if (newGrid[row][c]!.value === grid[row][col]!.value && !newGrid[row][c]!.isMerged) {
-                            newGrid[row][c] = grid[row][col]!.double().moveTo(row, c, newGrid[row][c]!.key);
+                            newGrid[row][c] = grid[row][col]!.addValue(newGrid[row][c]!).moveTo(row, c, newGrid[row][c]!.key);
                             newGrid[row][c]!.merge();
+                            addScore += newGrid[row][c]!.value;
                             isMoved = true;
                             isMerged = true;
                             cnt -= 1;
@@ -213,5 +245,5 @@ export function moveTiles(grid: (Tile | null)[][], direction: Direction) {
         }
     }
 
-    return result;
+    return [result, addScore] as const;
 }

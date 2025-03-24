@@ -21,8 +21,9 @@ export class Tile {
         keys.push(this.key);
     }
 
-    double(): Tile {
-        return new Tile(this.key, this.value * 2, this.row, this.col, this.isNew);
+    // 이렇게 하면 -3.2 -4.9 같은 타일도 가능
+    addValue(tile: Tile) {
+        return new Tile(this.key, this.value + tile.value, this.row, this.col, this.isNew);
     }
 
     moveTo(row: number, col: number, key?: number): Tile {
@@ -71,12 +72,10 @@ const TileStyle = styled.div<{ x: number; y: number, value: number, isnew?: bool
 	position: absolute;
 	width: calc((100% - ${(gridSize - 1) * 8}px) / ${gridSize});
 	height: calc((100% - ${(gridSize - 1) * 8}px) / ${gridSize});
-	transform: translate(${({ x }) => x}px, ${({ y }) => y}px)
-        scale(${({ isnew }) => isnew ? 0 : 1})
-        scale(${({ ismerged }) => ismerged ? 1.2 : 1});
+	transform: translate(${({ x }) => x}px, ${({ y }) => y}px) scale(${({ isnew }) => isnew ? 0 : 1}) scale(${({ ismerged }) => ismerged ? 1.2 : 1});
 	transition: ${({ isnew }) => isnew
-    ? 'none'
-    : 'transform 0.1s ease-in, opacity 0.3s ease'};
+		? "none"
+		: "transform 0.1s ease-in, opacity 0.3s ease"};
 	background-color: ${props => getColor(props.value).bgColor};
 	color: ${props => getColor(props.value).textColor};
 	display: flex;
@@ -84,14 +83,20 @@ const TileStyle = styled.div<{ x: number; y: number, value: number, isnew?: bool
 	justify-content: center;
 	font-weight: 600;
 
-    // todo: cellSize 사용해서 바꾸기
+	// todo: cellSize 사용해서 바꾸기
 	font-size: ${props => `${Math.max(0, 4 - 0.4 * props.value.toString().length) * 100}%`};
 	border-radius: 8px;
 `;
 
-export function TileElement({ x, y, value, isnew, ismerged }: { x: number; y: number; value: number, isnew: boolean, ismerged: boolean }) {
-    const [isNewLocal, setIsNewLocal] = useState(isnew);
-    const [isMergedLocal, setIsMergedLocal] = useState(ismerged);
+export function TileElement({ x, y, value, isnew, ismerged }: {
+    x: number;
+    y: number;
+    value: number,
+    isnew: boolean,
+    ismerged: boolean
+}) {
+    const [ isNewLocal, setIsNewLocal ] = useState(isnew);
+    const [ isMergedLocal, setIsMergedLocal ] = useState(ismerged);
     const tileRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -100,7 +105,7 @@ export function TileElement({ x, y, value, isnew, ismerged }: { x: number; y: nu
                 setIsNewLocal(false);
             });
         }
-    }, [isNewLocal]);
+    }, [ isNewLocal ]);
 
     useEffect(() => {
         if (isMergedLocal) {
@@ -108,7 +113,7 @@ export function TileElement({ x, y, value, isnew, ismerged }: { x: number; y: nu
                 setIsMergedLocal(false);
             });
         }
-    }, [isMergedLocal]);
+    }, [ isMergedLocal ]);
 
     return (
         <TileStyle ref={tileRef} x={x} y={y} value={value} isnew={isNewLocal} ismerged={isMergedLocal}>
