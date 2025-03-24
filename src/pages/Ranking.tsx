@@ -18,12 +18,11 @@ export default function Ranking() {
                 .select("*")
                 .order("score", { ascending: false });
 
-            if (error) {
+            if (error)
                 console.error("Error fetching rankings:", error);
-            }
-            else {
+            else
                 setRankings(data || []);
-            }
+
             setLoading(false);
         };
 
