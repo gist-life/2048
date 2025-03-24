@@ -18,9 +18,11 @@ const ScoreBoardStyle = styled.div`
 
 export function ScoreBoard({ score }: { score: number }) {
     return (
-        <ScoreBoardStyle>
-            <div style={{ "fontSize": "0.8rem", "color": "#ebe4da" }}>SCORE</div>
-            <div style={{ "fontSize": "1.7rem" }}>{score}</div>
-        </ScoreBoardStyle>
+        <>
+            <ScoreBoardStyle>
+                <div style={{ "fontSize": "0.8rem", "color": "#ebe4da" }}>SCORE</div>
+                <div style={{ "fontSize": "1.7rem" }}>{score}</div>
+            </ScoreBoardStyle>
+        </>
     );
 }

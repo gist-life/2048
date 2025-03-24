@@ -7,7 +7,6 @@ import { KeyboardEvent } from "react";
 import { FaCheck } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
-// 게임 오버 오버레이
 export const OverlayStyle = styled.div`
 	position: fixed;
 	top: 0;
@@ -85,6 +84,8 @@ export function Icon({ show, isError }: PropsWithChildren<{ show: boolean, isErr
 }
 
 export function Overlay({ text }: { text: string }) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     const [ { grid, score, isOver }, setCtx ] = useGame();
     const [inputText, setInputText] = useState("");
     const [isError, setError] = useState(false);

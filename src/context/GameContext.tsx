@@ -9,6 +9,8 @@ type GameContextType = {
     isOver: boolean,
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 const GameContext = createContext<{
     ctx: GameContextType,
     setCtx: Dispatch<SetStateAction<GameContextType>>
@@ -38,20 +40,20 @@ export type Direction = "move_up" | "move_down" | "move_left" | "move_right";
 function createInitialGrid(): (Tile | null)[][] {
     const initialGrid: (Tile | null)[][] = Array.from({ length: gridSize }, () => Array.from({ length: gridSize }, () => null));
     initialGrid[0][0] = new Tile(0, 2, 0, 0);
-    // initialGrid[1][1] = new Tile(1, 2, 1, 1);
-    initialGrid[0][1] = new Tile(1, 4, 0, 1);
-    initialGrid[0][2] = new Tile(2, 8, 0, 2);
-    initialGrid[0][3] = new Tile(3, 16, 0, 3);
-    initialGrid[1][0] = new Tile(4, 32, 1, 0);
-    initialGrid[1][1] = new Tile(5, 64, 1, 1);
-    initialGrid[1][2] = new Tile(6, 128, 1, 2);
-    initialGrid[1][3] = new Tile(7, 256, 1, 3);
-    initialGrid[2][0] = new Tile(8, 512, 2, 0);
-    initialGrid[2][1] = new Tile(9, 1024, 2, 1);
-    initialGrid[2][2] = new Tile(10, 2048, 2, 2);
-    initialGrid[2][3] = new Tile(11, 4096, 2, 3);
-    initialGrid[3][0] = new Tile(12, 8192, 3, 0);
-    initialGrid[3][1] = new Tile(13, 16384, 3, 1);
+    initialGrid[1][1] = new Tile(1, 2, 1, 1);
+    // initialGrid[0][1] = new Tile(1, 4, 0, 1);
+    // initialGrid[0][2] = new Tile(2, 8, 0, 2);
+    // initialGrid[0][3] = new Tile(3, 16, 0, 3);
+    // initialGrid[1][0] = new Tile(4, 32, 1, 0);
+    // initialGrid[1][1] = new Tile(5, 64, 1, 1);
+    // initialGrid[1][2] = new Tile(6, 128, 1, 2);
+    // initialGrid[1][3] = new Tile(7, 256, 1, 3);
+    // initialGrid[2][0] = new Tile(8, 512, 2, 0);
+    // initialGrid[2][1] = new Tile(9, 1024, 2, 1);
+    // initialGrid[2][2] = new Tile(10, 2048, 2, 2);
+    // initialGrid[2][3] = new Tile(11, 4096, 2, 3);
+    // initialGrid[3][0] = new Tile(12, 8192, 3, 0);
+    // initialGrid[3][1] = new Tile(13, 16384, 3, 1);
 
     return initialGrid;
 }
