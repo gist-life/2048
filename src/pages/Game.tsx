@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cell } from "../components/Cell.tsx";
 import { Grid } from "../components/Grid.tsx";
+import { SwipeInput } from "../components/MobileSwiper.tsx";
 import { Overlay } from "../components/Overlay.tsx";
 import { RankingIcon } from "../components/IconButton.tsx";
 import { ScoreBoard } from "../components/ScoreBoard.tsx";
@@ -41,12 +42,27 @@ export default function Game() {
             else if (e.key === "ArrowRight")
                 moveTile("move_right");
         }, 100);
-    }, [ moveTile ]);
+    }, [moveTile]);
+
+    const handleSwipe = useCallback(({ deltaX, deltaY }: SwipeInput) => {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 0)
+                moveTile("move_right");
+            else
+                moveTile("move_left");
+        }
+        else {
+            if (deltaY > 0)
+                moveTile("move_down");
+            else
+                moveTile("move_up");
+        }
+    }, [moveTile]);
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [ moveTile, grid, handleKeyDown ]);
+    }, [moveTile, grid, handleKeyDown]);
 
     useEffect(() => {
         const resizeObserver = new ResizeObserver(entries => {
@@ -95,7 +111,7 @@ export default function Game() {
             {isOver && <Overlay text="Game Over"/>}
             <RankingIcon/>
             <ScoreBoard score={score}/>
-            <Grid ref={containerRef}>
+            <Grid ref={containerRef} onSwipe={handleSwipe}>
                 {[ ...Array(gridSize * gridSize) ].map((_, i) => <Cell key={i}/>)}
                 {grid.flat().filter(t => t != null).map(tile => (
                     <TileElement
