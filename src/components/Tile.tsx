@@ -82,10 +82,13 @@ const TileStyle = styled.div<{ x: number; y: number, value: number, isnew?: bool
 	align-items: center;
 	justify-content: center;
 	font-weight: 600;
-
-	// todo: cellSize 사용해서 바꾸기
-	font-size: ${props => `${Math.max(0, 4 - 0.4 * props.value.toString().length) * 100}%`};
+    
+	font-size: ${props => `${Math.max(0.5, 4 - 0.4 * props.value.toString().length) * 100}%`};
 	border-radius: 8px;
+
+	@media (max-width: 768px) {
+		font-size: ${props => `${Math.max(0.5, 4 - 0.4 * props.value.toString().length) * 50}%`};
+	}
 `;
 
 export function TileElement({ x, y, value, isnew, ismerged }: {
